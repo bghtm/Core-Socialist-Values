@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>核心价值观加密器</title>
+
+<style>
+
+    *{
+        box-sizing:border-box;
+    }
+
+    body{
+        margin:0;
+        min-height:100vh;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        font-family:"Microsoft YaHei",sans-serif;
+
+        background-image:url("https://picsum.photos/1920/1080");
+        background-size:cover;
+        background-position:center;
+    }
+
+    .window{
+
+        width:700px;
+
+        background:rgba(255,255,255,0.75);
+
+        backdrop-filter:blur(10px);
+
+        border-radius:16px;
+
+        padding:24px;
+
+        box-shadow:
+            0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .title{
+
+        font-size:28px;
+        font-weight:bold;
+        margin-bottom:20px;
+    }
+
+    .label{
+
+        margin-top:18px;
+        margin-bottom:8px;
+        font-size:18px;
+    }
+
+    textarea,
+    input{
+
+        width:100%;
+
+        border:none;
+
+        border-radius:10px;
+
+        padding:14px;
+
+        font-size:16px;
+
+        background:rgba(255,255,255,0.9);
+
+        outline:none;
+    }
+
+    textarea{
+        resize:vertical;
+        min-height:120px;
+    }
+
+    .buttons{
+
+        display:flex;
+        gap:14px;
+
+        margin-top:20px;
+    }
+
+    button{
+
+        flex:1;
+
+        border:none;
+
+        border-radius:10px;
+
+        padding:14px;
+
+        font-size:18px;
+
+        cursor:pointer;
+
+        transition:0.2s;
+    }
+
+    button:hover{
+
+        transform:translateY(-2px);
+    }
+
+    .encrypt{
+        background:#87cefa;
+    }
+
+    .decrypt{
+        background:#90ee90;
+    }
+
+    .clear{
+        background:#ffb6c1;
+    }
+
+    .feature{
+
+        margin-top:18px;
+    }
+
+</style>
+</head>
+<body>
+
+<div class="window">
+
+    <div class="title">
+        核心价值观加密器
+    </div>
+
+    <div class="label">
+        欲加密的：
+    </div>
+
+    <textarea id="inputText"></textarea>
+
+    <div class="label">
+        核心价值观密文：
+    </div>
+
+    <textarea id="outputText"></textarea>
+
+    <div class="label">
+        特定密码：
+    </div>
+
+    <input
+        id="password"
+        type="number"
+        value="1589462"
+    >
+
+    <div class="buttons">
+
+        <button class="encrypt" onclick="encrypt()">
+            加密
+        </button>
+
+        <button class="decrypt" onclick="decrypt()">
+            解密
+        </button>
+
+        <button class="clear" onclick="clearAll()">
+            清空
+        </button>
+
+    </div>
+
+    <div class="feature">
+
+        <div class="label">
+            特征数字：
+        </div>
+
+        <textarea id="featureText"></textarea>
+
+    </div>
+
+</div>
+
+<script>
+
+    function encrypt(){
+
+        let text =
+            document.getElementById("inputText").value
+
+        let num =
+            parseInt(
+                document.getElementById("password").value
+            ) + 5
+
+        let password =
+            (num * 15 - 28) * 10 - 500
+
+        let numberText =
+            textToNumber(text,password)
+
+        document.getElementById("featureText").value =
+            numberText
+
+        let result =
+            replaceEncode(numberText)
+
+        document.getElementById("outputText").value =
+            result
+
+        if(result !== ""){
+            copy(result)
+        }
+    }
+
+    function decrypt(){
+
+        let text =
+            document.getElementById("outputText").value
+
+        let num =
+            parseInt(
+                document.getElementById("password").value
+            ) + 5
+
+        let password =
+            (num * 15 - 28) * 10 - 500
+
+        text =
+            replaceDecode(text)
+
+        document.getElementById("featureText").value =
+            text
+
+        let result =
+            numberToText(text,password)
+
+        document.getElementById("inputText").value =
+            result
+
+        if(result !== ""){
+            copy(result)
+        }
+    }
+
+    // 数字 -> 核心价值观
+    function replaceEncode(str){
+
+        return str
+            .replaceAll("1","富强民主")
+            .replaceAll("7","文明和谐")
+            .replaceAll("3","自由")
+            .replaceAll("0","平等")
+            .replaceAll("5","公正")
+            .replaceAll("6","法制")
+            .replaceAll("2","爱国")
+            .replaceAll("8","敬业")
+            .replaceAll("9","诚信")
+            .replaceAll("4","友善")
+    }
+
+    // 核心价值观 -> 数字
+    function replaceDecode(str){
+
+        return str
+            .replaceAll("富强民主","1")
+            .replaceAll("文明和谐","7")
+            .replaceAll("自由","3")
+            .replaceAll("平等","0")
+            .replaceAll("公正","5")
+            .replaceAll("法制","6")
+            .replaceAll("爱国","2")
+            .replaceAll("敬业","8")
+            .replaceAll("诚信","9")
+            .replaceAll("友善","4")
+    }
+
+    // 文本 -> 数字
+    function textToNumber(text,password){
+
+        let encoder =
+            new TextEncoder()
+
+        let bytes =
+            encoder.encode(text)
+
+        let result = ""
+
+        for(let b of bytes){
+
+            let x =
+                (b ^ ((password + 20) * 10 - 100)) & 0xff
+
+            result +=
+                x.toString().padStart(3,"0")
+        }
+
+        return result
+    }
+
+    // 数字 -> 文本
+    function numberToText(cipher,password){
+
+        let arr = []
+
+        for(let i=0;i<cipher.length;i+=3){
+
+            let sub =
+                cipher.substring(i,i+3)
+
+            let num =
+                parseInt(sub)
+
+            arr.push(
+                (num ^ ((password + 20) * 10 - 100)) & 0xff
+            )
+        }
+
+        let decoder =
+            new TextDecoder()
+
+        return decoder.decode(
+            new Uint8Array(arr)
+        )
+    }
+
+    // 复制
+    function copy(text){
+
+        navigator.clipboard.writeText(text)
+    }
+
+    // 清空
+    function clearAll(){
+
+        document.getElementById("inputText").value = ""
+        document.getElementById("outputText").value = ""
+        document.getElementById("featureText").value = ""
+    }
+
+    // 回车加密
+    document.getElementById("inputText")
+        .addEventListener("keydown",function(e){
+
+            if(e.key === "Enter" && !e.shiftKey){
+
+                e.preventDefault()
+
+                encrypt()
+            }
+        })
+
+    // 回车解密
+    document.getElementById("outputText")
+        .addEventListener("keydown",function(e){
+
+            if(e.key === "Enter" && !e.shiftKey){
+
+                e.preventDefault()
+
+                decrypt()
+            }
+        })
+
+</script>
+
+</body>
+</html>
